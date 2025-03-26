@@ -1,68 +1,164 @@
-<!--
-title: 'AWS NodeJS Example'
-description: 'This template demonstrates how to deploy a simple NodeJS function running on AWS Lambda using the Serverless Framework.'
-layout: Doc
-framework: v4
-platform: AWS
-language: nodeJS
-priority: 1
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, Inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# Medical Appointments API Challenge
 
-# Serverless Framework AWS NodeJS Example
+## Challenge Overview
 
-This template demonstrates how to deploy a simple NodeJS function running on AWS Lambda using the Serverless Framework. The deployed function does not include any event definitions or any kind of persistence (database). For more advanced configurations check out the [examples repo](https://github.com/serverless/examples/) which include use cases like API endpoints, workers triggered by SQS, persistence with DynamoDB, and scheduled tasks. For details about configuration of specific events, please refer to our [documentation](https://www.serverless.com/framework/docs/providers/aws/events/).
+This project implements a backend system for medical appointment scheduling for insured patients in Peru and Chile. The system allows users to schedule medical appointments by selecting a medical center, specialty, doctor, and date/time. The scheduling processing flow differs by country.
 
-## Usage
+## Architecture
+
+The application follows Clean Architecture principles, with a clear separation of:
+
+- **Domain Layer**: Core business logic, entities, and rules
+- **Application Layer**: Use cases and application services
+- **Infrastructure Layer**: Implementation details (AWS services, databases, etc.)
+
+### AWS Services Used
+
+The solution leverages the following AWS services:
+
+- **API Gateway**: Exposes RESTful endpoints
+- **Lambda**: Serverless functions for processing appointment requests
+- **DynamoDB**: NoSQL database for storing appointment information
+- **SNS**: Notification service for publishing appointment events
+- **SQS**: Message queues for country-specific processing
+- **EventBridge**: Event bus for handling completed appointments
+- **RDS (MySQL)**: Relational database for country-specific appointment storage
+
+## Project Structure
+
+```
+├── src/
+│   ├── domain/            # Domain models, entities, repositories interfaces
+│   ├── application/       # Use cases and application services
+│   ├── infrastructure/    # Implementation details for AWS services
+│   │   ├── lambdas/       # Lambda function implementations
+│   │   ├── repositories/  # Repository implementations
+│   │   ├── adapters/      # Adapters between layers
+│   │   └── container/     # Dependency injection container
+│   └── utils/             # Common utilities and helper functions
+├── serverless.yml        # Infrastructure as code definition
+├── package.json          # Project dependencies
+├── LICENSE               # MIT License file
+└── tsconfig.json         # TypeScript configuration
+```
+
+## Features
+
+- **Appointment Creation**: Create new medical appointments
+- **Appointment Retrieval**: Get all appointments for a specific insured ID
+- **Country-Specific Processing**: Different processing flows for Peru (PE) and Chile (CL)
+- **Asynchronous Processing**: Event-driven architecture for appointment completion
+- **API Documentation**: OpenAPI/Swagger documentation
+
+## Implementation Details
+
+### API Endpoints
+
+- **POST /appointment**: Create a new appointment
+
+  - Input: `{insuredId: string, scheduleId: number, countryISO: string}`
+  - Response: Appointment creation confirmation with status "pending"
+
+- **GET /appointment?insuredId=<id>**: Retrieve appointments for a specific insured ID
+  - Response: List of appointments with their statuses
+
+### Data Flow
+
+1. Client sends appointment request to API Gateway
+2. `appointment` Lambda stores the request in DynamoDB with "pending" status
+3. `appointment` Lambda sends the request to SNS with country-specific attributes
+4. SNS filters messages by country code and routes to appropriate SQS queue
+5. Country-specific Lambdas (`appointment_pe` or `appointment_cl`) process the messages
+6. Country Lambdas store data in MySQL RDS and send completion event to EventBridge
+7. EventBridge routes the completion event to a dedicated SQS queue
+8. `appointment` Lambda processes the completion message and updates DynamoDB status to "completed"
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 20.x or higher
+- AWS CLI configured with appropriate permissions
+- Serverless Framework
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Ysparky/medical-appointments.git
+cd medical-appointments
+
+# Install dependencies
+yarn install
+```
 
 ### Deployment
 
-In order to deploy the example, you need to run the following command:
+```bash
+# Deploy to AWS (dev stage)
+yarn deploy
 
-```
-serverless deploy
-```
-
-After running deploy, you should see output similar to:
-
-```
-Deploying "aws-node" to stage "dev" (us-east-1)
-
-✔ Service deployed to stack aws-node-dev (90s)
-
-functions:
-  hello: aws-node-dev-hello (1.5 kB)
+# Package the service
+yarn package
 ```
 
-### Invocation
+### Local Development
 
-After successful deployment, you can invoke the deployed function by using the following command:
+```bash
+# Install serverless-offline plugin
+yarn add --dev serverless-offline
 
-```
-serverless invoke --function hello
-```
-
-Which should result in response similar to the following:
-
-```json
-{
-  "statusCode": 200,
-  "body": "{\"message\":\"Go Serverless v4.0! Your function executed successfully!\"}"
-}
+# Start the service locally
+serverless offline start
 ```
 
-### Local development
+## Testing
 
-The easiest way to develop and test your function is to use the Serverless Framework's `dev` command:
+The API can be tested using tools like Postman or curl:
+
+```bash
+# Create a new appointment
+curl -X POST https://ndb5xw6gyk.execute-api.us-east-1.amazonaws.com/dev/appointment \
+  -H "Content-Type: application/json" \
+  -d '{"insuredId": "12345", "scheduleId": 100, "countryISO": "PE"}'
+
+# Get appointments for an insured ID
+curl -X GET https://ndb5xw6gyk.execute-api.us-east-1.amazonaws.com/dev/appointment?insuredId=12345
+```
+
+## API Documentation
+
+Swagger documentation is available at:
 
 ```
-serverless dev
+https://ndb5xw6gyk.execute-api.us-east-1.amazonaws.com/dev/docs
 ```
 
-This will start a local emulator of AWS Lambda and tunnel your requests to and from AWS Lambda, allowing you to interact with your function as if it were running in the cloud.
+## Implementation Checklist
 
-Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
+- [x] Project setup with Serverless Framework
+- [x] TypeScript configuration
+- [x] Domain layer implementation
+  - [x] Entity models
+  - [x] Repository interfaces
+  - [x] Validation schemas
+- [x] Application layer implementation
+  - [x] Use cases
+- [x] Infrastructure layer implementation
+  - [x] Lambda functions
+  - [x] Repository implementations
+  - [x] Adapters
+- [x] AWS services configuration
+  - [x] DynamoDB
+  - [x] SNS
+  - [x] SQS
+  - [x] EventBridge
+- [x] API endpoints
+  - [x] POST /appointment
+  - [x] GET /appointment
+- [x] OpenAPI/Swagger documentation
+- [ ] Unit tests
 
-When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
