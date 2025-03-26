@@ -11,29 +11,51 @@ async function handleHttpRequest(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
-    const requestBody = JSON.parse(event.body || "{}");
-    const appointment = Appointment.fromJSON(requestBody);
-    const result = await container.createAppointmentUseCase.execute(
-      appointment
-    );
+    if (event.httpMethod === "GET") {
+      const insuredId = event.queryStringParameters?.insuredId;
+      if (!insuredId) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ message: "Insured ID is required" }),
+        };
+      }
+
+      const appointments =
+        await container.getAppointmentsByInsuredIdUseCase.execute(insuredId);
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: "Appointments retrieved successfully",
+          data: appointments,
+        }),
+      };
+    }
+
+    if (event.httpMethod === "POST") {
+      const requestBody = JSON.parse(event.body || "{}");
+      const appointment = Appointment.fromJSON(requestBody);
+      const result = await container.createAppointmentUseCase.execute(
+        appointment
+      );
+
+      return {
+        statusCode: 201,
+        body: JSON.stringify({
+          message: "Appointment created successfully",
+          data: result,
+        }),
+      };
+    }
 
     return {
-      statusCode: 201,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: "Appointment created successfully",
-        data: result,
-      }),
+      statusCode: 405,
+      body: JSON.stringify({ message: "Method not allowed" }),
     };
   } catch (error) {
     console.error("Error creating appointment:", error);
     return {
       statusCode: 500,
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({
         message: "Error processing appointment",
         error: error instanceof Error ? error.message : "Unknown error",

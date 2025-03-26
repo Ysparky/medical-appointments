@@ -10,13 +10,11 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:PutItem
-        - dynamodb:GetItem
-        - dynamodb:Scan
         - dynamodb:Query
         - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
       Resource:
         - Fn::GetAtt: [AppointmentTable, Arn]
+        - Fn::Join: ['/', [Fn::GetAtt: [AppointmentTable, Arn], 'index/insuredId-index']]
 
     - Effect: Allow
       Action:
@@ -61,9 +59,22 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
+          - AttributeName: insuredId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: insuredId-index
+            KeySchema:
+              - AttributeName: insuredId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
         BillingMode: PAY_PER_REQUEST
 
     AppointmentTopic:
@@ -192,6 +203,10 @@ functions:
       - http:
           path: appointment
           method: post
+          cors: true
+      - http:
+          path: appointment
+          method: get
           cors: true
       - sqs:
           arn:

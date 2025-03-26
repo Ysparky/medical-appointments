@@ -1,10 +1,12 @@
-import { marshall } from "@aws-sdk/util-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { Appointment } from "../../domain/entities/appointment.entity";
 import { IAppointmentRepository } from "../../domain/repositories/appointment.repository";
 import {
   DynamoDBClient,
   PutItemCommand,
   PutItemCommandInput,
+  QueryCommand,
+  QueryCommandInput,
   UpdateItemCommand,
   UpdateItemCommandInput,
 } from "@aws-sdk/client-dynamodb";
@@ -45,5 +47,25 @@ export class DynamoDBAppointmentRepository implements IAppointmentRepository {
     );
     console.log("Appointment updated:", result);
     return Appointment.fromJSON(result.Attributes);
+  }
+
+  async findAllByInsuredId(insuredId: string): Promise<Appointment[]> {
+    const params: QueryCommandInput = {
+      TableName: this.tableName,
+      IndexName: "insuredId-index",
+      KeyConditionExpression: "insuredId = :insuredId",
+      ExpressionAttributeValues: marshall({ ":insuredId": insuredId }),
+      ScanIndexForward: false,
+    };
+    const result = await this.dynamoDBClient.send(new QueryCommand(params));
+
+    if (!result.Items || result.Items.length === 0) {
+      return [];
+    }
+
+    return result.Items.map((item) => {
+      const plainObject = unmarshall(item);
+      return Appointment.fromJSON(plainObject);
+    });
   }
 }

@@ -2,6 +2,7 @@ import { DynamoDBAppointmentRepository } from "../repositories/dynamodb-appointm
 import { CreateAppointmentUseCase } from "../../application/use-cases/create-appointment.use-case";
 import { ProcessAppointmentUseCase } from "../../application/use-cases/process-appointment.use-case";
 import { CompleteAppointmentUseCase } from "../../application/use-cases/complete-appointment.use-case";
+import { GetAppointmentsByInsuredIdUseCase } from "../../application/use-cases/get-appointments-by-insured-id.use-case";
 import { SNSMessageQueueAdapter } from "../adapters/sns-message-queue.adapter";
 import { EventBridgeEventBusAdapter } from "../adapters/event-bridge-event-bus.adapter";
 
@@ -18,6 +19,8 @@ export const container = {
   createAppointmentUseCase: null as unknown as CreateAppointmentUseCase,
   processAppointmentUseCase: null as unknown as ProcessAppointmentUseCase,
   completeAppointmentUseCase: null as unknown as CompleteAppointmentUseCase,
+  getAppointmentsByInsuredIdUseCase:
+    null as unknown as GetAppointmentsByInsuredIdUseCase,
 };
 
 // Initialize use cases with their dependencies
@@ -33,3 +36,6 @@ container.processAppointmentUseCase = new ProcessAppointmentUseCase(
 container.completeAppointmentUseCase = new CompleteAppointmentUseCase(
   container.appointmentRepository
 );
+
+container.getAppointmentsByInsuredIdUseCase =
+  new GetAppointmentsByInsuredIdUseCase(container.appointmentRepository);
