@@ -3,9 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "package": "serverless package",
+    "build": "tsc"
+  },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.148",
     "@types/node": "^22.13.13",
+    "serverless-auto-swagger": "^3.1.0",
     "typescript": "^5.8.2"
   },
   "dependencies": {
@@ -15,6 +21,7 @@
     "@aws-sdk/client-sqs": "^3.775.0",
     "@aws-sdk/util-dynamodb": "^3.775.0",
     "mysql2": "^3.14.0",
+    "serverless": "^4.9.1",
     "uuidv4": "^6.2.13",
     "zod": "^3.24.2"
   }

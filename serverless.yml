@@ -1,5 +1,20 @@
 service: medical-appointments-challenge
 
+plugins:
+  - serverless-auto-swagger
+  - serverless-offline
+
+custom:
+  autoswagger:
+    title: "Medical Appointments API"
+    apiType: "http"
+    generateSwaggerOnDeploy: true
+    typefiles: ['./src/utils/api-types.d.ts']
+    swaggerFiles: ['./src/utils/definitions.json']
+    basePath: "/dev"
+    swaggerPath: "docs"
+    apiKeyHeaders: []
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -48,6 +63,7 @@ build:
       setNodeOptions: true
     external:
       - aws-sdk
+      - serverless-auto-swagger
     packages: external
 
 resources:
@@ -204,10 +220,39 @@ functions:
           path: appointment
           method: post
           cors: true
+          summary: "Create a new appointment"
+          description: "Creates a new appointment with the provided data"
+          bodyType: AppointmentCreateInput
+          responses:
+            "201":
+              description: "Appointment created successfully"
+              bodyType: AppointmentCreateOutput
+            "400":
+              description: "Validation error"
+              bodyType: Error
+            "500":
+              description: "Internal server error"
+              bodyType: Error
       - http:
           path: appointment
           method: get
           cors: true
+          summary: "Get appointments by insured ID"
+          description: "Retrieves all appointments for a given insured ID"
+          queryStringParameters:
+            insuredId:
+              type: string
+              required: true
+          responses:
+            "200":
+              description: "Appointment retrieved successfully"
+              bodyType: AppointmentGetOutput
+            "400":
+              description: "Validation error"
+              bodyType: Error
+            "500":
+              description: "Internal server error"
+              bodyType: Error
       - sqs:
           arn:
             Fn::GetAtt: [AppointmentCompletionQueue, Arn]

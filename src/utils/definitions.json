@@ -1,0 +1,18 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Medical Appointments API",
+    "version": "1.0.0"
+  },
+  "paths": {},
+  "definitions": {
+    "CountryISO": {
+      "type": "string",
+      "enum": ["PE", "CL"]
+    },
+    "AppointmentStatus": {
+      "type": "string",
+      "enum": ["PENDING", "COMPLETED"]
+    }
+  }
+}
