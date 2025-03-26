@@ -49,7 +49,7 @@ export class Appointment implements IAppointment {
     this.updatedAt = updatedAt ?? new Date().toISOString();
   }
 
-  toJson(): IAppointment {
+  toObject(): IAppointment {
     return {
       id: this.id,
       insuredId: this.insuredId,
@@ -62,6 +62,6 @@ export class Appointment implements IAppointment {
   }
 
   toDynamoDBItem(): Record<string, AttributeValue> {
-    return marshall(this.toJson());
+    return marshall(this.toObject());
   }
 }

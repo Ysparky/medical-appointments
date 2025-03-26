@@ -18,6 +18,22 @@ provider:
       Resource:
         - Fn::GetAtt: [AppointmentTable, Arn]
 
+    - Effect: Allow
+      Action:
+        - sns:Publish
+      Resource:
+        - Ref: AppointmentTopic
+
+    - Effect: Allow
+      Action:
+        - sqs:SendMessage
+        - sqs:ReceiveMessage
+        - sqs:DeleteMessage
+        - sqs:GetQueueAttributes
+      Resource:
+        - Fn::GetAtt: [AppointmentQueuePE, Arn]
+        - Fn::GetAtt: [AppointmentQueueCL, Arn]
+
 build:
   esbuild:
     bundle: true
@@ -43,6 +59,43 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
 
+    AppointmentTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${sls:stage}-appointments
+
+    AppointmentQueuePE:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${sls:stage}-appointments-queue-pe
+
+    AppointmentQueueCL:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${sls:stage}-appointments-queue-cl
+
+    AppointmentQueuePESubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        TopicArn:
+          Ref: AppointmentTopic
+        Protocol: sqs
+        Endpoint:
+          Fn::GetAtt: [AppointmentQueuePE, Arn]
+        FilterPolicy:
+          countryISO: ["PE"]
+
+    AppointmentQueueCLSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        TopicArn:
+          Ref: AppointmentTopic
+        Protocol: sqs
+        Endpoint:
+          Fn::GetAtt: [AppointmentQueueCL, Arn]
+        FilterPolicy:
+          countryISO: ["CL"]
+
 functions:
   appointment:
     handler: src/infrastructure/lambdas/appointment.handler
@@ -53,3 +106,5 @@ functions:
           cors: true
     environment:
       DYNAMODB_TABLE_NAME: ${sls:stage}-appointments
+      SNS_TOPIC_ARN:
+        Ref: AppointmentTopic
