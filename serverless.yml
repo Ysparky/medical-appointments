@@ -1,0 +1,21 @@
+service: medical-appointments-challenge
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+
+build:
+  esbuild:
+    bundle: true
+    minify: true
+    sourcemap:
+      type: linked
+      setNodeOptions: true
+    external:
+      - aws-sdk
+    packages: external
+
+plugins:
+  - serverless-plugin-typescript
+  
+  

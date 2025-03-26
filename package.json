@@ -1,0 +1,9 @@
+{
+  "name": "medical-appointments-challenge",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless-plugin-typescript": "^2.1.5"
+  }
+}
