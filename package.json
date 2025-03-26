@@ -15,6 +15,7 @@
     "@aws-sdk/client-sqs": "^3.775.0",
     "@aws-sdk/util-dynamodb": "^3.775.0",
     "mysql2": "^3.14.0",
-    "uuidv4": "^6.2.13"
+    "uuidv4": "^6.2.13",
+    "zod": "^3.24.2"
   }
 }

@@ -15,7 +15,7 @@ export enum CountryISO {
 export interface IAppointment {
   id: string;
   insuredId: string;
-  scheduleId: string;
+  scheduleId: number;
   countryISO: CountryISO;
   status: AppointmentStatus;
   createdAt: string;
@@ -25,7 +25,7 @@ export interface IAppointment {
 export class Appointment implements IAppointment {
   id: string;
   insuredId: string;
-  scheduleId: string;
+  scheduleId: number;
   countryISO: CountryISO;
   status: AppointmentStatus;
   createdAt: string;
@@ -33,7 +33,7 @@ export class Appointment implements IAppointment {
 
   constructor(
     insuredId: string,
-    scheduleId: string,
+    scheduleId: number,
     countryISO: CountryISO,
     id?: string,
     status?: AppointmentStatus,
