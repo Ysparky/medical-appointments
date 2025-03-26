@@ -11,7 +11,7 @@ export class SNSMessageQueueAdapter implements IMessageQueueAdapter {
   private readonly topicArn: string;
 
   constructor() {
-    this.snsClient = new SNSClient();
+    this.snsClient = new SNSClient({ region: "us-east-1" });
     this.topicArn = process.env.SNS_TOPIC_ARN!;
     console.log("SNS Topic ARN:", this.topicArn);
   }

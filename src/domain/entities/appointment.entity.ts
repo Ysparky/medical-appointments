@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export enum AppointmentStatus {
   PENDING = "PENDING",
-  CONFIRMED = "CONFIRMED",
+  COMPLETED = "COMPLETED",
 }
 
 export enum CountryISO {
@@ -49,6 +49,18 @@ export class Appointment implements IAppointment {
     this.updatedAt = updatedAt ?? new Date().toISOString();
   }
 
+  static fromJSON(json: any): Appointment {
+    return new Appointment(
+      json.insuredId,
+      json.scheduleId,
+      json.countryISO as CountryISO,
+      json.id,
+      json.status as AppointmentStatus,
+      json.createdAt,
+      json.updatedAt
+    );
+  }
+
   toObject(): IAppointment {
     return {
       id: this.id,
@@ -63,5 +75,10 @@ export class Appointment implements IAppointment {
 
   toDynamoDBItem(): Record<string, AttributeValue> {
     return marshall(this.toObject());
+  }
+
+  updateStatus(status: AppointmentStatus): void {
+    this.status = status;
+    this.updatedAt = new Date().toISOString();
   }
 }

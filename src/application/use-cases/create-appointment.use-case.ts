@@ -7,17 +7,9 @@ export class CreateAppointmentUseCase {
     private readonly messageQueueAdapter: IMessageQueueAdapter
   ) {}
 
-  async execute({
-    insuredId,
-    scheduleId,
-    countryISO,
-  }: Appointment): Promise<Appointment> {
-    console.log("Creating appointment with:", {
-      insuredId,
-      scheduleId,
-      countryISO,
-    });
-    const appointment = new Appointment(insuredId, scheduleId, countryISO);
+  async execute(appointment: Appointment): Promise<Appointment> {
+    console.log("Creating appointment with:", appointment.toObject());
+
     // Create appointment in DynamoDB
     await this.appointmentRepository.create(appointment);
     console.log("Appointment created in DynamoDB");

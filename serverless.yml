@@ -33,6 +33,13 @@ provider:
       Resource:
         - Fn::GetAtt: [AppointmentQueuePE, Arn]
         - Fn::GetAtt: [AppointmentQueueCL, Arn]
+        - Fn::GetAtt: [AppointmentCompletionQueue, Arn]
+
+    - Effect: Allow
+      Action:
+        - events:PutEvents
+      Resource:
+        - Fn::GetAtt: [AppointmentEventBus, Arn]
 
 build:
   esbuild:
@@ -68,11 +75,49 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: ${sls:stage}-appointments-queue-pe
+    
+    AppointmentQueuePEPolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        Queues:
+          - Ref: AppointmentQueuePE
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: sns.amazonaws.com
+              Action: sqs:SendMessage
+              Resource:
+                Fn::GetAtt: [AppointmentQueuePE, Arn]
+              Condition:
+                ArnEquals:
+                  aws:SourceArn:
+                    Ref: AppointmentTopic
 
     AppointmentQueueCL:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: ${sls:stage}-appointments-queue-cl
+
+    AppointmentQueueCLPolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        Queues:
+          - Ref: AppointmentQueueCL
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: sns.amazonaws.com
+              Action: sqs:SendMessage
+              Resource:
+                Fn::GetAtt: [AppointmentQueueCL, Arn]
+              Condition:
+                ArnEquals:
+                  aws:SourceArn:
+                    Ref: AppointmentTopic
 
     AppointmentQueuePESubscription:
       Type: AWS::SNS::Subscription
@@ -96,6 +141,50 @@ resources:
         FilterPolicy:
           countryISO: ["CL"]
 
+    AppointmentCompletionQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${sls:stage}-appointments-completion-queue
+
+    EventBridgeToSQSRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: events.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: EventBridgeToSQSPolicy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action: sqs:SendMessage
+                  Resource: 
+                    Fn::GetAtt: [AppointmentCompletionQueue, Arn]
+
+    AppointmentEventBus:
+      Type: AWS::Events::EventBus
+      Properties:
+        Name: ${sls:stage}-appointments-events
+
+    AppointmentCompletionRule:
+      Type: AWS::Events::Rule
+      Properties:
+        EventBusName:
+          Ref: AppointmentEventBus
+        EventPattern:
+          detail-type: ["APPOINTMENT_PROCESSED"]
+        Targets:
+          - Arn:
+              Fn::GetAtt: [AppointmentCompletionQueue, Arn]
+            Id: "AppointmentCompletionQueue"
+            RoleArn:
+              Fn::GetAtt: [EventBridgeToSQSRole, Arn]
+
 functions:
   appointment:
     handler: src/infrastructure/lambdas/appointment.handler
@@ -104,7 +193,35 @@ functions:
           path: appointment
           method: post
           cors: true
+      - sqs:
+          arn:
+            Fn::GetAtt: [AppointmentCompletionQueue, Arn]
+          batchSize: 1
     environment:
       DYNAMODB_TABLE_NAME: ${sls:stage}-appointments
       SNS_TOPIC_ARN:
         Ref: AppointmentTopic
+
+  appointment_pe:
+    handler: src/infrastructure/lambdas/appointment_pe.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [AppointmentQueuePE, Arn]
+          batchSize: 1
+    environment:
+      DYNAMODB_TABLE_NAME: ${sls:stage}-appointments
+      EVENTBRIDGE_BUS_NAME:
+        Ref: AppointmentEventBus
+
+  appointment_cl:
+    handler: src/infrastructure/lambdas/appointment_cl.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [AppointmentQueueCL, Arn]
+          batchSize: 1
+    environment:
+      DYNAMODB_TABLE_NAME: ${sls:stage}-appointments
+      EVENTBRIDGE_BUS_NAME:
+        Ref: AppointmentEventBus

@@ -1,9 +1,12 @@
+import { marshall } from "@aws-sdk/util-dynamodb";
 import { Appointment } from "../../domain/entities/appointment.entity";
 import { IAppointmentRepository } from "../../domain/repositories/appointment.repository";
 import {
   DynamoDBClient,
   PutItemCommand,
   PutItemCommandInput,
+  UpdateItemCommand,
+  UpdateItemCommandInput,
 } from "@aws-sdk/client-dynamodb";
 
 export class DynamoDBAppointmentRepository implements IAppointmentRepository {
@@ -22,5 +25,25 @@ export class DynamoDBAppointmentRepository implements IAppointmentRepository {
     };
     await this.dynamoDBClient.send(new PutItemCommand(params));
     return appointment;
+  }
+
+  async processAppointment(appointment: Appointment): Promise<Appointment> {
+    const params: UpdateItemCommandInput = {
+      TableName: this.tableName,
+      Key: marshall({ id: appointment.id }),
+      UpdateExpression: "set #status = :status, updated_at = :updatedAt",
+      ExpressionAttributeNames: { "#status": "status" },
+      ExpressionAttributeValues: marshall({
+        ":status": appointment.status,
+        ":updatedAt": appointment.updatedAt,
+      }),
+      ReturnValues: "UPDATED_NEW",
+    };
+
+    const result = await this.dynamoDBClient.send(
+      new UpdateItemCommand(params)
+    );
+    console.log("Appointment updated:", result);
+    return Appointment.fromJSON(result.Attributes);
   }
 }
