@@ -3,6 +3,20 @@ service: medical-appointments-challenge
 provider:
   name: aws
   runtime: nodejs20.x
+  region: us-east-1
+  environment:
+    APPOINTMENT_TABLE_NAME: ${sls:stage}-appointments
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:Scan
+        - dynamodb:Query
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - Fn::GetAtt: [AppointmentTable, Arn]
 
 build:
   esbuild:
@@ -15,7 +29,27 @@ build:
       - aws-sdk
     packages: external
 
-plugins:
-  - serverless-plugin-typescript
-  
-  
+resources:
+  Resources:
+    AppointmentTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${sls:stage}-appointments
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+functions:
+  appointment:
+    handler: src/infrastructure/lambdas/appointment.handler
+    events:
+      - http:
+          path: appointment
+          method: post
+          cors: true
+    environment:
+      DYNAMODB_TABLE_NAME: ${sls:stage}-appointments
