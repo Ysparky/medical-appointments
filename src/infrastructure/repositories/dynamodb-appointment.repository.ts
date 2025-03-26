@@ -31,7 +31,7 @@ export class DynamoDBAppointmentRepository implements IAppointmentRepository {
     const params: UpdateItemCommandInput = {
       TableName: this.tableName,
       Key: marshall({ id: appointment.id }),
-      UpdateExpression: "set #status = :status, updated_at = :updatedAt",
+      UpdateExpression: "set #status = :status, updatedAt = :updatedAt",
       ExpressionAttributeNames: { "#status": "status" },
       ExpressionAttributeValues: marshall({
         ":status": appointment.status,
