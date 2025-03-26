@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "serverless-plugin-typescript": "^2.1.5"
+    "serverless-plugin-typescript": "^2.1.5",
+    "typescript": "^5.8.2"
   }
 }
