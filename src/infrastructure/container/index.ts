@@ -1,4 +1,8 @@
 import { DynamoDBAppointmentRepository } from '../repositories/dynamodb-appointment.repository';
+import {
+  MySQLAppointmentRepositoryPE,
+  MySQLAppointmentRepositoryCL,
+} from '../repositories/mysql-appointment.repository';
 import { CreateAppointmentUseCase } from '../../application/use-cases/create-appointment.use-case';
 import { ProcessAppointmentUseCase } from '../../application/use-cases/process-appointment.use-case';
 import { CompleteAppointmentUseCase } from '../../application/use-cases/complete-appointment.use-case';
@@ -14,6 +18,8 @@ export const container = {
 
   // Repositories
   appointmentRepository: new DynamoDBAppointmentRepository(),
+  mysqlAppointmentRepositoryPE: new MySQLAppointmentRepositoryPE(),
+  mysqlAppointmentRepositoryCL: new MySQLAppointmentRepositoryCL(),
 
   // Use cases
   createAppointmentUseCase: null as unknown as CreateAppointmentUseCase,
@@ -27,8 +33,6 @@ container.createAppointmentUseCase = new CreateAppointmentUseCase(
   container.appointmentRepository,
   container.messageQueueAdapter,
 );
-
-container.processAppointmentUseCase = new ProcessAppointmentUseCase(container.eventBusAdapter);
 
 container.completeAppointmentUseCase = new CompleteAppointmentUseCase(
   container.appointmentRepository,

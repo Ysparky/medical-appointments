@@ -1,6 +1,12 @@
 import { SQSEvent } from 'aws-lambda';
 import { container } from '../container';
 import { Appointment } from '../../domain/entities/appointment.entity';
+import { ProcessAppointmentUseCase } from '../../application/use-cases/process-appointment.use-case';
+
+const processAppointmentUseCase = new ProcessAppointmentUseCase(
+  container.eventBusAdapter,
+  container.mysqlAppointmentRepositoryPE,
+);
 
 export const handler = async (event: SQSEvent): Promise<void> => {
   try {
@@ -10,7 +16,9 @@ export const handler = async (event: SQSEvent): Promise<void> => {
       console.log('Processing PE appointment:', appointmentData);
 
       const appointment = Appointment.fromJSON(appointmentData);
-      await container.processAppointmentUseCase.execute(appointment);
+
+      await processAppointmentUseCase.execute(appointment);
+
       console.log('Successfully processed PE appointment:', appointment.id);
     }
   } catch (error) {

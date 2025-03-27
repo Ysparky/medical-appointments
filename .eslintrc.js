@@ -51,7 +51,7 @@ module.exports = {
       files: ['src/**/*.ts'],
       rules: {
         'no-console': 'off',
-      }
+      },
     },
     {
       files: ['src/infrastructure/**/*.ts', 'src/utils/**/*.ts', 'src/domain/**/*.ts'],

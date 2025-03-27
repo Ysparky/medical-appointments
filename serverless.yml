@@ -2,7 +2,6 @@ service: medical-appointments-challenge
 
 plugins:
   - serverless-auto-swagger
-  - serverless-offline
 
 custom:
   autoswagger:
@@ -273,6 +272,10 @@ functions:
       DYNAMODB_TABLE_NAME: ${sls:stage}-appointments
       EVENTBRIDGE_BUS_NAME:
         Ref: AppointmentEventBus
+      RDS_HOST_PE: ${env:RDS_HOST_PE}
+      RDS_USER_PE: ${env:RDS_USER_PE}
+      RDS_PASSWORD_PE: ${env:RDS_PASSWORD_PE}
+      RDS_DATABASE_PE: ${env:RDS_DATABASE_PE}
 
   appointment_cl:
     handler: src/infrastructure/lambdas/appointment_cl.handler
@@ -285,3 +288,7 @@ functions:
       DYNAMODB_TABLE_NAME: ${sls:stage}-appointments
       EVENTBRIDGE_BUS_NAME:
         Ref: AppointmentEventBus
+      RDS_HOST_CL: ${env:RDS_HOST_CL}
+      RDS_USER_CL: ${env:RDS_USER_CL}
+      RDS_PASSWORD_CL: ${env:RDS_PASSWORD_CL}
+      RDS_DATABASE_CL: ${env:RDS_DATABASE_CL}
