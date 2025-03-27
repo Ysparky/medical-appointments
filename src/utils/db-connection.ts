@@ -1,35 +1,33 @@
-import * as mysql from 'mysql2/promise';
+import { Pool, PoolClient } from 'pg';
 
-const pools: Record<string, mysql.Pool> = {};
+const pools: Record<string, Pool> = {};
 
 export class ConnectionPoolManager {
-  public static getPool(key: string, config: mysql.PoolOptions): mysql.Pool {
+  public static getPool(key: string, config: any): Pool {
     if (!pools[key]) {
-      pools[key] = mysql.createPool({
+      pools[key] = new Pool({
         ...config,
-        connectionLimit: 10,
-        queueLimit: 0,
-        waitForConnections: true,
-        enableKeepAlive: true,
-        keepAliveInitialDelay: 0,
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
       });
 
-      console.log(`Created new connection pool for ${key}`);
+      console.log(`Created new PostgreSQL connection pool for ${key}`);
     }
 
     return pools[key];
   }
 
-  public static async getConnection(key: string): Promise<mysql.PoolConnection> {
+  public static async getConnection(key: string): Promise<PoolClient> {
     const pool = pools[key];
     if (!pool) {
       throw new Error(`No pool exists for key: ${key}`);
     }
 
     try {
-      return await pool.getConnection();
+      return await pool.connect();
     } catch (error) {
-      console.error(`Failed to get connection for ${key}:`, error);
+      console.error(`Failed to get PostgreSQL connection for ${key}:`, error);
       throw error;
     }
   }
@@ -39,7 +37,7 @@ export class ConnectionPoolManager {
     if (pool) {
       await pool.end();
       delete pools[key];
-      console.log(`Closed and removed pool for ${key}`);
+      console.log(`Closed and removed PostgreSQL pool for ${key}`);
     }
   }
 }

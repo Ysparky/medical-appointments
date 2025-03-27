@@ -18,6 +18,7 @@
     "@types/aws-lambda": "^8.10.148",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.13",
+    "@types/pg": "^8.10.9",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.57.0",
@@ -36,7 +37,7 @@
     "@aws-sdk/client-sns": "^3.775.0",
     "@aws-sdk/client-sqs": "^3.775.0",
     "@aws-sdk/util-dynamodb": "^3.775.0",
-    "mysql2": "^3.14.0",
+    "pg": "^8.11.3",
     "serverless": "^4.9.1",
     "uuidv4": "^6.2.13",
     "zod": "^3.24.2"

@@ -276,6 +276,8 @@ functions:
       RDS_USER_PE: ${env:RDS_USER_PE}
       RDS_PASSWORD_PE: ${env:RDS_PASSWORD_PE}
       RDS_DATABASE_PE: ${env:RDS_DATABASE_PE}
+      RDS_PORT_PE: ${env:RDS_PORT_PE, '5432'}
+      RDS_SSL_PE: ${env:RDS_SSL_PE, 'false'}
 
   appointment_cl:
     handler: src/infrastructure/lambdas/appointment_cl.handler
@@ -292,3 +294,5 @@ functions:
       RDS_USER_CL: ${env:RDS_USER_CL}
       RDS_PASSWORD_CL: ${env:RDS_PASSWORD_CL}
       RDS_DATABASE_CL: ${env:RDS_DATABASE_CL}
+      RDS_PORT_CL: ${env:RDS_PORT_CL, '5432'}
+      RDS_SSL_CL: ${env:RDS_SSL_CL, 'false'}

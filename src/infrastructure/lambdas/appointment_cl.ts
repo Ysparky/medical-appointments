@@ -5,7 +5,7 @@ import { ProcessAppointmentUseCase } from '../../application/use-cases/process-a
 
 const processAppointmentUseCase = new ProcessAppointmentUseCase(
   container.eventBusAdapter,
-  container.mysqlAppointmentRepositoryCL,
+  container.postgresqlAppointmentRepositoryCL,
 );
 
 export const handler = async (event: SQSEvent): Promise<void> => {
