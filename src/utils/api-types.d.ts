@@ -1,12 +1,12 @@
 // Define types for API input/output
 export enum CountryISO {
-  PERU = "PE",
-  CHILE = "CL",
+  PERU = 'PE',
+  CHILE = 'CL',
 }
 
 export enum AppointmentStatus {
-  PENDING = "PENDING",
-  COMPLETED = "COMPLETED",
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
 }
 
 export interface Appointment {

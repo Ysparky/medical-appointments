@@ -1,15 +1,12 @@
-import { APIGatewayProxyResult } from "aws-lambda";
-import {
-  ValidationError,
-  ValidationService,
-} from "../domain/validation/validation.service";
+import { APIGatewayProxyResult } from 'aws-lambda';
+import { ValidationError, ValidationService } from '../domain/validation/validation.service';
 
 // Helper function to check if an error is a ValidationError
 export function isValidationError(error: unknown): error is ValidationError {
   return (
     error instanceof Error &&
-    error.name === "ValidationError" &&
-    typeof (error as any).errors !== "undefined"
+    error.name === 'ValidationError' &&
+    typeof (error as any).errors !== 'undefined'
   );
 }
 
@@ -19,7 +16,7 @@ export function createErrorResponse(error: unknown): APIGatewayProxyResult {
     return {
       statusCode: 400,
       body: JSON.stringify({
-        message: "Validation Error",
+        message: 'Validation Error',
         errors: ValidationService.formatZodError(error.errors),
       }),
     };
@@ -27,18 +24,18 @@ export function createErrorResponse(error: unknown): APIGatewayProxyResult {
     return {
       statusCode: 400,
       body: JSON.stringify({
-        message: "Invalid request body",
-        error: "Request body must be valid JSON",
+        message: 'Invalid request body',
+        error: 'Request body must be valid JSON',
       }),
     };
   }
 
-  console.error("Error processing request:", error);
+  console.error('Error processing request:', error);
   return {
     statusCode: 500,
     body: JSON.stringify({
-      message: "Internal Server Error",
-      error: error instanceof Error ? error.message : "Unknown error",
+      message: 'Internal Server Error',
+      error: error instanceof Error ? error.message : 'Unknown error',
     }),
   };
 }

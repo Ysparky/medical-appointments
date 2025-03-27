@@ -1,9 +1,9 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export class ValidationError extends Error {
   constructor(public errors: z.ZodError) {
-    super("Validation Error");
-    this.name = "ValidationError";
+    super('Validation Error');
+    this.name = 'ValidationError';
   }
 }
 
@@ -23,7 +23,7 @@ export class ValidationService {
     const formattedErrors: Record<string, string[]> = {};
 
     for (const err of error.errors) {
-      const path = err.path.join(".");
+      const path = err.path.join('.');
       if (!formattedErrors[path]) {
         formattedErrors[path] = [];
       }

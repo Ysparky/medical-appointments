@@ -1,8 +1,5 @@
-import {
-  Appointment,
-  AppointmentStatus,
-} from "../../domain/entities/appointment.entity";
-import { IAppointmentRepository } from "../../domain/repositories/appointment.repository";
+import { Appointment, AppointmentStatus } from '../../domain/entities/appointment.entity';
+import { IAppointmentRepository } from '../../domain/repositories/appointment.repository';
 
 export class CompleteAppointmentUseCase {
   constructor(private readonly appointmentRepository: IAppointmentRepository) {}

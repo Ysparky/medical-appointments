@@ -1,4 +1,4 @@
-import * as mysql from "mysql2/promise";
+import * as mysql from 'mysql2/promise';
 
 const pools: Record<string, mysql.Pool> = {};
 
@@ -20,9 +20,7 @@ export class ConnectionPoolManager {
     return pools[key];
   }
 
-  public static async getConnection(
-    key: string
-  ): Promise<mysql.PoolConnection> {
+  public static async getConnection(key: string): Promise<mysql.PoolConnection> {
     const pool = pools[key];
     if (!pool) {
       throw new Error(`No pool exists for key: ${key}`);

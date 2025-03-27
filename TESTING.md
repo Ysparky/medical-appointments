@@ -25,15 +25,11 @@ The Jest configuration is in `jest.config.js`:
 
 ```javascript
 module.exports = {
-  preset: "ts-jest",
-  testEnvironment: "node",
-  testMatch: ["**/__tests__/**/*.test.ts"],
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  testMatch: ['**/__tests__/**/*.test.ts'],
   collectCoverage: true,
-  collectCoverageFrom: [
-    "src/**/*.ts",
-    "!src/**/*.d.ts",
-    "!src/infrastructure/lambdas/**/*.ts",
-  ],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/infrastructure/lambdas/**/*.ts'],
   // ...
 };
 ```
@@ -81,9 +77,9 @@ yarn test __tests__/infrastructure
 1. **Entity Testing**: Verifying entity construction, serialization, and methods
 
    ```typescript
-   describe("Appointment Entity", () => {
-     it("should create a new appointment with default values", () => {
-       const appointment = new Appointment("12345", 100, CountryISO.PERU);
+   describe('Appointment Entity', () => {
+     it('should create a new appointment with default values', () => {
+       const appointment = new Appointment('12345', 100, CountryISO.PERU);
        expect(appointment.id).toBeDefined();
        expect(appointment.status).toBe(AppointmentStatus.PENDING);
      });
@@ -92,12 +88,12 @@ yarn test __tests__/infrastructure
 
 2. **Validation Testing**: Testing schema validation rules
    ```typescript
-   describe("appointmentCreateSchema", () => {
-     it("should validate valid appointment creation data", () => {
+   describe('appointmentCreateSchema', () => {
+     it('should validate valid appointment creation data', () => {
        const validData = {
-         insuredId: "12345",
+         insuredId: '12345',
          scheduleId: 100,
-         countryISO: "PE",
+         countryISO: 'PE',
        };
        const result = appointmentCreateSchema.parse(validData);
        expect(result).toEqual(expect.objectContaining(validData));
@@ -110,15 +106,15 @@ yarn test __tests__/infrastructure
 1. **Use Case Testing**: Testing business logic in isolation
 
    ```typescript
-   describe("CreateAppointmentUseCase", () => {
+   describe('CreateAppointmentUseCase', () => {
      const mockAppointmentRepository = mock<IAppointmentRepository>();
      const mockMessageQueueAdapter = mock<IMessageQueueAdapter>();
      const createAppointmentUseCase = new CreateAppointmentUseCase(
        mockAppointmentRepository,
-       mockMessageQueueAdapter
+       mockMessageQueueAdapter,
      );
 
-     it("should create an appointment and publish it to the message queue", async () => {
+     it('should create an appointment and publish it to the message queue', async () => {
        // Test implementation
      });
    });
@@ -129,10 +125,10 @@ yarn test __tests__/infrastructure
 1. **Repository Testing**: Testing data access logic
 
    ```typescript
-   describe("DynamoDBAppointmentRepository", () => {
-     it("should create an appointment in DynamoDB", async () => {
+   describe('DynamoDBAppointmentRepository', () => {
+     it('should create an appointment in DynamoDB', async () => {
        // Arrange
-       const appointment = new Appointment("12345", 100, CountryISO.PERU);
+       const appointment = new Appointment('12345', 100, CountryISO.PERU);
        mockDynamoDBClient.send.mockResolvedValue({});
 
        // Act
@@ -140,7 +136,7 @@ yarn test __tests__/infrastructure
 
        // Assert
        expect(PutItemCommand).toHaveBeenCalledWith({
-         TableName: "test-appointments",
+         TableName: 'test-appointments',
          Item: appointment.toDynamoDBItem(),
        });
      });
@@ -149,8 +145,8 @@ yarn test __tests__/infrastructure
 
 2. **Lambda Handler Testing**: Testing AWS Lambda handlers
    ```typescript
-   describe("Appointment Lambda Handler", () => {
-     it("should create an appointment successfully", async () => {
+   describe('Appointment Lambda Handler', () => {
+     it('should create an appointment successfully', async () => {
        // Test implementation
      });
    });

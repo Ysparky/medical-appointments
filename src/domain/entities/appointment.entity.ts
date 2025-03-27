@@ -1,15 +1,15 @@
-import { AttributeValue } from "@aws-sdk/client-dynamodb";
-import { marshall } from "@aws-sdk/util-dynamodb";
-import { v4 as uuidv4 } from "uuid";
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
+import { v4 as uuidv4 } from 'uuid';
 
 export enum AppointmentStatus {
-  PENDING = "PENDING",
-  COMPLETED = "COMPLETED",
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
 }
 
 export enum CountryISO {
-  PERU = "PE",
-  CHILE = "CL",
+  PERU = 'PE',
+  CHILE = 'CL',
 }
 
 export interface IAppointment {
@@ -38,7 +38,7 @@ export class Appointment implements IAppointment {
     id?: string,
     status?: AppointmentStatus,
     createdAt?: string,
-    updatedAt?: string
+    updatedAt?: string,
   ) {
     this.id = id ?? uuidv4();
     this.insuredId = insuredId;
@@ -57,7 +57,7 @@ export class Appointment implements IAppointment {
       json.id,
       json.status as AppointmentStatus,
       json.createdAt,
-      json.updatedAt
+      json.updatedAt,
     );
   }
 

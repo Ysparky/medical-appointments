@@ -1,18 +1,15 @@
-import { z } from "zod";
-import { AppointmentStatus, CountryISO } from "../entities/appointment.entity";
+import { z } from 'zod';
+import { AppointmentStatus, CountryISO } from '../entities/appointment.entity';
 
 export const appointmentCreateSchema = z.object({
   insuredId: z
     .string()
-    .min(1, "Insured ID is required")
-    .length(5, "Insured ID must be 5 characters long")
-    .regex(/^[0-9]+$/, "Insured ID must be a 5-digit number"),
-  scheduleId: z.coerce
-    .number()
-    .int()
-    .positive("Schedule ID must be a positive integer"),
+    .min(1, 'Insured ID is required')
+    .length(5, 'Insured ID must be 5 characters long')
+    .regex(/^[0-9]+$/, 'Insured ID must be a 5-digit number'),
+  scheduleId: z.coerce.number().int().positive('Schedule ID must be a positive integer'),
   countryISO: z.nativeEnum(CountryISO, {
-    errorMap: () => ({ message: "Country ISO must be PE or CL" }),
+    errorMap: () => ({ message: 'Country ISO must be PE or CL' }),
   }),
   id: z.string().uuid().optional(),
   status: z.nativeEnum(AppointmentStatus).optional(),
@@ -23,9 +20,9 @@ export const appointmentCreateSchema = z.object({
 export const appointmentGetSchema = z.object({
   insuredId: z
     .string()
-    .min(1, "Insured ID is required")
-    .length(5, "Insured ID must be 5 characters long")
-    .regex(/^[0-9]+$/, "Insured ID must be a 5-digit number"),
+    .min(1, 'Insured ID is required')
+    .length(5, 'Insured ID must be 5 characters long')
+    .regex(/^[0-9]+$/, 'Insured ID must be a 5-digit number'),
 });
 
 export type AppointmentCreateInput = z.infer<typeof appointmentCreateSchema>;
