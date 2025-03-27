@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export class ValidationError extends Error {
   constructor(public errors: z.ZodError) {
-    super("Validation error");
+    super("Validation Error");
     this.name = "ValidationError";
   }
 }

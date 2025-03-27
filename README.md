@@ -36,8 +36,13 @@ The solution leverages the following AWS services:
 │   │   ├── adapters/      # Adapters between layers
 │   │   └── container/     # Dependency injection container
 │   └── utils/             # Common utilities and helper functions
+├── __tests__/             # Unit tests
+│   ├── domain/            # Tests for domain layer components
+│   ├── application/       # Tests for application layer use cases
+│   └── infrastructure/    # Tests for infrastructure components
 ├── serverless.yml        # Infrastructure as code definition
 ├── package.json          # Project dependencies
+├── jest.config.js        # Jest configuration for testing
 ├── LICENSE               # MIT License file
 └── tsconfig.json         # TypeScript configuration
 ```
@@ -114,6 +119,43 @@ serverless offline start
 
 ## Testing
 
+The project uses Jest for unit testing. The tests are organized to match the application's architecture, with separate test folders for domain, application, and infrastructure layers.
+
+```bash
+# Run all tests
+yarn test
+
+# Run tests with watch mode
+yarn test:watch
+
+# Generate test coverage report
+yarn test:coverage
+```
+
+### Test Structure
+
+- **Domain Layer Tests**: Tests for entities, validation, and repository interfaces
+- **Application Layer Tests**: Tests for use cases and application services
+- **Infrastructure Layer Tests**: Tests for repositories, adapters, and Lambda handlers
+
+### Mocking Strategies
+
+- **AWS SDK Mocks**: Tests for infrastructure components mock AWS service clients
+- **Repository Mocks**: Application layer tests use mocked repositories
+- **Time Manipulation**: Tests use Jest's timer mocks to control timestamps
+
+### Coverage Report
+
+To view the test coverage report, run:
+
+```bash
+yarn test:coverage
+```
+
+This will generate a coverage report in the `coverage` directory.
+
+## API Testing
+
 The API can be tested using tools like Postman or curl:
 
 ```bash
@@ -157,7 +199,7 @@ https://ndb5xw6gyk.execute-api.us-east-1.amazonaws.com/dev/docs
   - [x] POST /appointment
   - [x] GET /appointment
 - [x] OpenAPI/Swagger documentation
-- [ ] Unit tests
+- [x] Unit tests
 
 ## License
 

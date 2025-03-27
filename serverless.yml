@@ -228,10 +228,10 @@ functions:
               description: "Appointment created successfully"
               bodyType: AppointmentCreateOutput
             "400":
-              description: "Validation error"
+              description: "Validation Error"
               bodyType: Error
             "500":
-              description: "Internal server error"
+              description: "Internal Server Error"
               bodyType: Error
       - http:
           path: appointment
@@ -248,10 +248,10 @@ functions:
               description: "Appointment retrieved successfully"
               bodyType: AppointmentGetOutput
             "400":
-              description: "Validation error"
+              description: "Validation Error"
               bodyType: Error
             "500":
-              description: "Internal server error"
+              description: "Internal Server Error"
               bodyType: Error
       - sqs:
           arn:
